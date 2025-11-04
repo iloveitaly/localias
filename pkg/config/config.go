@@ -18,8 +18,8 @@ type Config struct {
 }
 
 type Entry struct {
-	Alias string
-	Port  int
+	Alias string `json:"alias"`
+	Port  int    `json:"port"`
 }
 
 // Set will add or update the existing list of entries.  If there is
