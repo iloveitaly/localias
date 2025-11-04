@@ -98,6 +98,8 @@ localias set <alias> <port>
 localias clear
 # list all aliases
 localias list
+# list all aliases in JSON format (useful for scripts and testing)
+localias list --json
 # remove an alias
 localias remove <alias>
 # import all the aliases from another config file
