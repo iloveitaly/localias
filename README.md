@@ -521,6 +521,12 @@ localias  39020   pd   12u     IPv6 0xb3abbd50442da23f       0t0                
 In order for localias to start, you'll have to kill the process that is
 interfering and binding to these ports.
 
+## Using Localias in GitHub Actions
+
+Running Localias in GitHub Actions CI environments enables testing with URLs that mirror production setups. While Localias works well in CI, there are some Ubuntu-specific quirks around self-signed SSL certificate handling that require special attention.
+
+For a complete, working implementation including certificate warming procedures and chromium testing with backoff mechanisms, see the community-maintained [github-action-localias](https://github.com/iloveitaly/github-action-localias) action. This action handles the edge cases around certificate installation and NSS databases in GitHub Actions runners.
+
 # General reading / links / sources
 
 - https://blog.mozilla.org/security/2019/02/14/why-does-mozilla-maintain-our-own-root-certificate-store/
