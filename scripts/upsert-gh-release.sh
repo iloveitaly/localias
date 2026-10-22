@@ -9,14 +9,13 @@
 #   https://docs.github.com/en/rest/releases/releases#create-a-release
 #   https://stackoverflow.com/questions/45240336/how-to-use-github-release-api-to-make-a-release-without-source-code
 version=$(cat ./VERSION)
-commit_sha=$(git rev-parse --short HEAD || echo 'unknown')
-# https://semver.org/#spec-item-10
-release_name="$version+commit.$commit_sha"
+commit_sha=$(git rev-parse HEAD || echo 'main')
+release_name="$version"
 if ! upload_url=$(
   gh api --method POST 'repos/{owner}/{repo}/releases' \
     -F "tag_name=$release_name" \
     -F "name=$release_name" \
-    -F "target_comitish=$commit_sha" \
+    -F "target_commitish=$commit_sha" \
     --jq '.upload_url' \
 ); then 
   if ! upload_url=$(
