@@ -8,15 +8,27 @@
 # Docs:
 #   https://docs.github.com/en/rest/releases/releases#create-a-release
 #   https://stackoverflow.com/questions/45240336/how-to-use-github-release-api-to-make-a-release-without-source-code
-version=$(cat ./VERSION)
-commit_sha=$(git rev-parse --short HEAD || echo 'unknown')
-# https://semver.org/#spec-item-10
-release_name="$version+commit.$commit_sha"
+# Read base version from ./VERSION (e.g. v3.0.1) and count commits since ./VERSION
+# was last modified so each push to main gets a strictly increasing SemVer patch.
+base_version=$(tr -d '[:space:]' < ./VERSION)
+version_commit=$(git log -n 1 --pretty=format:%H -- ./VERSION 2>/dev/null || true)
+if [ -n "$version_commit" ]; then
+  commits_since=$(git rev-list --count "${version_commit}..HEAD")
+else
+  commits_since=0
+fi
+# Split "v3.0.1" into "v3.0" (%.*) and "1" (##*.), then offset patch by commit count
+major_minor="${base_version%.*}"
+base_patch="${base_version##*.}"
+patch=$((base_patch + commits_since))
+
+commit_sha=$(git rev-parse HEAD || echo 'main')
+release_name="${major_minor}.${patch}"
 if ! upload_url=$(
   gh api --method POST 'repos/{owner}/{repo}/releases' \
     -F "tag_name=$release_name" \
     -F "name=$release_name" \
-    -F "target_comitish=$commit_sha" \
+    -F "target_commitish=$commit_sha" \
     --jq '.upload_url' \
 ); then 
   if ! upload_url=$(
