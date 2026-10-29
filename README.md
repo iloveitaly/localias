@@ -292,7 +292,7 @@ Available Commands:
   clear       clear all aliases
   help        Help about any command
   import      import all aliases from another config file
-  list        list all aliases
+  list        list aliases from the saved configuration
   rm          remove an alias
   run         run the proxy server in the foreground
   set         add or edit an alias
@@ -308,6 +308,37 @@ Flags:
 
 Use "localias [command] --help" for more information about a command.
 ```
+
+## JSON output for preflight checks
+
+Use `localias status --json` to check the background daemon process:
+
+```json
+{"running":true,"pid":98213}
+```
+
+A stopped daemon is a successful result with `{"running":false,"pid":null}`.
+This checks the process recorded in the daemon PID file; it does not check proxy
+readiness or detect a server started in the foreground with `localias run`.
+
+Use `localias list --json` to read aliases from the saved configuration selected
+by `--configfile`, `LOCALIAS_CONFIGFILE`, or the usual configuration search:
+
+```json
+{"aliases":{"api-test.movie-tickets.localhost":14201,"embed.movie-tickets.localhost":14204}}
+```
+
+An empty configuration returns `{"aliases":{}}`. Ports are JSON integers.
+`list --format json` is equivalent to `list --json`. Choose either `--json` or
+`--format`; the default output format is text.
+
+Successful JSON commands write one JSON document to stdout. Errors exit with a
+nonzero status and write plain diagnostics to stderr.
+
+`list` reports saved configuration, even when a daemon is running. Editing saved
+ports does not change the running daemon until `localias reload` is called.
+There is currently no live configuration query, so these commands cannot detect
+whether the daemon is still serving old ports.
 
 # Errata
 
